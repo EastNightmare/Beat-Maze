@@ -110,6 +110,8 @@ namespace Assets.Editor.PRPR
                 Clear();
                 var xmlStr = File.ReadAllText(path);
                 var mazeInfo = XmlUtil.Deserialize(typeof(MazeInfo), xmlStr) as MazeInfo;
+                m_FlexPosition = mazeInfo.startPos;
+                m_FlexForwardDir = mazeInfo.startDir;
                 if (mazeInfo != null)
                 {
                     foreach (var node in mazeInfo.flexNodeList)
@@ -118,7 +120,6 @@ namespace Assets.Editor.PRPR
                     }
                 }
                 m_Clip = ResourcesLoader.Load(mazeInfo.musicPath) as AudioClip;
-                Debug.Log(m_Clip);
             }
         }
 
@@ -154,13 +155,14 @@ namespace Assets.Editor.PRPR
                 m_GizmosGO = MazeMapGizmos.instance.gameObject;
                 m_GizmosGO.name = "Maze Maker Gizmos";
             }
-            OnFlexChange();
+
+            OnFlexChange(true, node);
             OnOtherFlexChange();
             var flexType = (FlexType)m_SelectFlexTypeIdx;
-            node = node ?? new FlexNode(m_FlexDic.Count, flexType, m_FlexTime);
-            var info = new FlexGOInfo(node, m_FlexPosition, m_FlexForwardDir);
+            var n = node ?? new FlexNode(m_FlexDic.Count, flexType, m_FlexTime);
+            var info = new FlexGOInfo(n, m_FlexPosition, m_FlexForwardDir);
             var flexGO = FlexFactory.CreateFlex(info);
-            m_FlexDic.Add(flexGO, node);
+            m_FlexDic.Add(flexGO, n);
             flexGO.transform.localScale = Vector3.one * m_Scale;
             flexGO.transform.SetParent(m_FlexGOParent.transform);
         }
@@ -232,7 +234,26 @@ namespace Assets.Editor.PRPR
             }
         }
 
-        private void OnFlexChange(bool isPush = true)
+        private void OnLoadNodeFinish(FlexNode node)
+        {
+            if (node == null)
+            {
+                return;
+            }
+            var flexGO = m_FlexDic.Keys.Last<GameObject>();
+            var flexType = m_FlexDic.Values.Last<FlexNode>().type;
+            m_FlexTime = m_FlexDic.Values.Last<FlexNode>().time;
+            var preFlexTime = node.time;
+            var timeBetween = m_FlexTime - preFlexTime;
+            Debug.Log(timeBetween);
+            m_FlexForwardDir = flexType == FlexType.Left
+                ? -flexGO.transform.right
+                : (flexType == FlexType.Right ? flexGO.transform.right : flexGO.transform.forward);
+            m_FlexPosition += m_FlexForwardDir * m_Scale * (timeBetween / m_ReactTime);
+            OnOtherFlexChange();
+        }
+
+        private void OnFlexChange(bool isPush = true, FlexNode node = null)
         {
             if (m_FlexDic.Count == 0)
             {
@@ -243,6 +264,7 @@ namespace Assets.Editor.PRPR
             if (isPush)
             {
                 var preFlexTime = m_FlexDic.Values.Last<FlexNode>().time;
+                m_FlexTime = node != null ? node.time : m_FlexTime;
                 var timeBetween = m_FlexTime - preFlexTime;
                 m_FlexForwardDir = flexType == FlexType.Left
                     ? -flexGO.transform.right
