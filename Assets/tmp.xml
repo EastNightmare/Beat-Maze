@@ -4,7 +4,7 @@
     <FlexNode>
       <type>Straight</type>
       <idx>0</idx>
-      <time>0.2</time>
+      <time>0</time>
     </FlexNode>
     <FlexNode>
       <type>Straight</type>
@@ -12,114 +12,9 @@
       <time>0.2</time>
     </FlexNode>
     <FlexNode>
-      <type>Straight</type>
+      <type>Right</type>
       <idx>2</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>3</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>4</idx>
-      <time>0.4</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>5</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Straight</type>
-      <idx>6</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>7</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>8</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>9</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>10</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>11</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>12</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>13</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>14</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>15</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>16</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>17</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Straight</type>
-      <idx>18</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Straight</type>
-      <idx>19</idx>
-      <time>0.2</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>20</idx>
-      <time>0.4</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Straight</type>
-      <idx>21</idx>
-      <time>0.4</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Left</type>
-      <idx>22</idx>
-      <time>0.4</time>
-    </FlexNode>
-    <FlexNode>
-      <type>Right</type>
-      <idx>23</idx>
-      <time>0.4</time>
+      <time>0.41</time>
     </FlexNode>
   </flexNodeList>
   <scale>1</scale>
@@ -134,4 +29,5 @@
     <y>0</y>
     <z>1</z>
   </startDir>
+  <musicPath>Audios/BGM/telekinesis</musicPath>
 </MazeInfo>

@@ -13,7 +13,7 @@ namespace Assets.Scripts.Core.Client
         public static GameObject CreateFlex(FlexGOInfo info)
         {
             var name = info.node.type.ToString() + " Flex";
-            var flexGO = ResourceLoader.Load("PRPR/GameObjects/" + name) as GameObject;
+            var flexGO = ResourcesLoader.Load("GameObjects/" + name) as GameObject;
             var go = Object.Instantiate(flexGO, info.pos, Quaternion.LookRotation(info.fwd)) as GameObject;
             return go;
         }

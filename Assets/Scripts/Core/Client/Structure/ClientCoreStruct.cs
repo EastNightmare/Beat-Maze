@@ -48,14 +48,16 @@ namespace Assets.Scripts.Core.Client.Structure
         public float scale;
         public float reactTime;
         public Vector3 startPos, startDir;
+        public string musicPath;
 
-        public MazeInfo(List<FlexNode> l, float s, float r, Vector3 pos, Vector3 dir)
+        public MazeInfo(List<FlexNode> l, float s, float r, Vector3 pos, Vector3 dir, string path)
         {
             flexNodeList = l;
             scale = s;
             reactTime = r;
             startPos = pos;
             startDir = dir;
+            musicPath = path;
         }
 
         public MazeInfo()
@@ -65,6 +67,7 @@ namespace Assets.Scripts.Core.Client.Structure
             reactTime = 0.0f;
             startPos = Vector3.zero;
             startDir = Vector3.forward;
+            musicPath = string.Empty;
         }
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Tool
 {
-    public class ResourceLoader
+    public class ResourcesLoader
     {
         public static Object Load(string path)
         {

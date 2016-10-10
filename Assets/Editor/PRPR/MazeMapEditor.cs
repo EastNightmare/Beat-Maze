@@ -3,11 +3,10 @@ using Assets.Scripts.Core.Client;
 using Assets.Scripts.Core.Client.Enum;
 using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.PRPR_Editor;
-using System.Collections;
+using Assets.Scripts.Tool;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,6 +28,7 @@ namespace Assets.Editor.PRPR
         private GameObject m_GizmosGO;
         private Vector2 m_ScrollPos;
         private List<GameObject[]> m_OtherFlexGOList;
+        private AudioClip m_Clip;
 
         private void OnGUI()
         {
@@ -77,6 +77,7 @@ namespace Assets.Editor.PRPR
             this.titleContent = new GUIContent("Maze Maker");
             GUILayout.Label("Flex Direction");
             m_SelectFlexTypeIdx = GUILayout.SelectionGrid(m_SelectFlexTypeIdx, new[] { new GUIContent(EditorGUIUtility.Load("PRPR/Gizmos/LeftArrow.png") as Texture), new GUIContent(EditorGUIUtility.Load("PRPR/Gizmos/StraightArrow.png") as Texture), new GUIContent(EditorGUIUtility.Load("PRPR/Gizmos/RightArrow.png") as Texture) }, 3);
+            m_Clip = EditorGUILayout.ObjectField(m_Clip, typeof(AudioClip)) as AudioClip;
             m_Scale = EditorGUILayout.FloatField("Scale", m_Scale);
             m_ReactTime = EditorGUILayout.FloatField("React Time", m_ReactTime);
             m_FlexPosition = EditorGUILayout.Vector3Field("Flex Position", m_FlexPosition);
@@ -92,7 +93,9 @@ namespace Assets.Editor.PRPR
             {
                 var startPos = m_FlexDic.Count > 0 ? m_FlexDic.Keys.First<GameObject>().transform.position : Vector3.zero;
                 var startDir = m_FlexDic.Count > 0 ? m_FlexDic.Keys.First<GameObject>().transform.forward : Vector3.forward;
-                var mazeInfo = new MazeInfo(m_FlexDic.Values.ToList(), m_Scale, m_ReactTime, startPos, startDir);
+                var musicPath = AssetDatabase.GetAssetPath(m_Clip).Replace("Assets/Resources/", string.Empty);
+                musicPath = musicPath.Split('.')[0];
+                var mazeInfo = new MazeInfo(m_FlexDic.Values.ToList(), m_Scale, m_ReactTime, startPos, startDir, musicPath);
                 var xmlStr = XmlUtil.Serializer(typeof(MazeInfo), mazeInfo);
                 File.WriteAllText(path, xmlStr);
             }
@@ -108,10 +111,14 @@ namespace Assets.Editor.PRPR
                 var xmlStr = File.ReadAllText(path);
                 var mazeInfo = XmlUtil.Deserialize(typeof(MazeInfo), xmlStr) as MazeInfo;
                 if (mazeInfo != null)
+                {
                     foreach (var node in mazeInfo.flexNodeList)
                     {
                         Push(node);
                     }
+                }
+                m_Clip = ResourcesLoader.Load(mazeInfo.musicPath) as AudioClip;
+                Debug.Log(m_Clip);
             }
         }
 
@@ -168,6 +175,7 @@ namespace Assets.Editor.PRPR
             m_FlexForwardDir = Vector3.zero;
             m_OtherFlexGOList = null;
             m_FlexTime = 0;
+            m_Clip = null;
         }
 
         private void OnOtherFlexChange(bool add = true)
@@ -192,7 +200,6 @@ namespace Assets.Editor.PRPR
                 var rest = offsetNum - num;
                 rest = rest > 0 ? rest : 1 + rest;
                 var gos = new GameObject[num];
-                Debug.Log(rest);
 
                 for (int i = 1; i < num; i++)
                 {
