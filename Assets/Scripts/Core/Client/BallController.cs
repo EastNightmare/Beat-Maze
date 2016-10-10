@@ -13,6 +13,7 @@ namespace Assets.Scripts.Core.Client
         public TextAsset xmlAsset;
         private float m_ReactSpeed;
         private List<FlexGOInfo> m_FlexInfoList;
+        private MazeInfo m_MazeInfo;
         private int m_Idx = 0;
         private Tweener m_MoveTweener;
         private Transform[] m_Flexs;
@@ -48,6 +49,10 @@ namespace Assets.Scripts.Core.Client
             {
                 m_MoveTweener.Kill();
             }
+            if (m_Idx > m_FlexInfoList.Count - 1)
+            {
+                return;
+            }
             var flexNode = m_FlexInfoList[m_Idx++];
             var dir = flexNode.fwd;
             if (dir == ball.transform.forward)
@@ -56,7 +61,28 @@ namespace Assets.Scripts.Core.Client
                 return;
             }
             ball.transform.forward = dir;
-            m_MoveTweener = ball.transform.DOMove(ball.transform.position + dir * 10.0f, 10.0f / m_ReactSpeed).SetEase(Ease.Linear);
+            m_MoveTweener = ball.transform.DOMove(ball.transform.position + dir * 1000.0f, 1000.0f / m_ReactSpeed).SetEase(Ease.Linear);
+        }
+
+        private void OnCollisionEnter(Collision col)
+        {
+            if (col.gameObject.tag == "Wall")
+            {
+                if (m_MoveTweener != null)
+                {
+                    m_MoveTweener.Kill();
+                    m_MoveTweener = null;
+                    transform.position = Vector3.up;
+                    transform.forward = Vector3.up;
+                    DOTweenUtil.Delay(() =>
+                    {
+                        gameObject.GetComponent<AudioSource>().Stop();
+                        gameObject.GetComponent<AudioSource>().Play();
+                        m_Idx = 0;
+                        Move2NextPos();
+                    }, 1.0f);
+                }
+            }
         }
     }
 }

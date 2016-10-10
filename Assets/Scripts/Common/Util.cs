@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace Assets.Scripts.Common
 {
-    public class DoTweenUtil
+    public class DOTweenUtil
     {
         public static Sequence Delay(Action callFunc, float dt)
         {

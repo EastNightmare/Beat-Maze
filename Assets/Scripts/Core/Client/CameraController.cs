@@ -13,6 +13,18 @@ namespace Assets.Scripts.Core.Client
         public AnimationCurve curve;
         private Tweener m_LookAtTwner;
 
+        public void DoLook()
+        {
+            m_LookAtTwner = transform.DOLookAt(target.position, lookAtTime, AxisConstraint.None, target.forward).SetEase(curve);
+        }
+
+        public void Reset()
+        {
+            transform.position = Vector3.Lerp(transform.position, target.position + posOffset, Time.deltaTime * posLerp);
+            var lookAtPos = Vector3.Normalize(target.position - transform.position);
+            transform.forward = lookAtPos;
+        }
+
         private void LateUpdate()
         {
             if (target)
@@ -21,7 +33,7 @@ namespace Assets.Scripts.Core.Client
                 var lookAtPos = Vector3.Normalize(target.position - transform.position);
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    m_LookAtTwner = transform.DOLookAt(target.position, lookAtTime, AxisConstraint.None, BallController.instance.ball.transform.forward).SetEase(curve);
+                    DoLook();
                 }
                 else
                 {
