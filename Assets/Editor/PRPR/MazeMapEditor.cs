@@ -187,13 +187,26 @@ namespace Assets.Editor.PRPR
                 var startPos = preFlexGO.transform.position;
                 var endPos = m_FlexPosition;
                 var dir = m_FlexForwardDir;
-                var num = Mathf.CeilToInt(Vector3.Distance(startPos, endPos) / m_Scale);
+                var offsetNum = Vector3.Distance(startPos, endPos) / m_Scale;
+                var num = Mathf.CeilToInt(offsetNum);
+                var rest = offsetNum - num;
+                rest = rest > 0 ? rest : 1 + rest;
                 var gos = new GameObject[num];
+                Debug.Log(rest);
+
                 for (int i = 1; i < num; i++)
                 {
-                    var info = new FlexGOInfo(new FlexNode(), startPos + i * dir * m_Scale, dir);
+                    var scale = m_Scale;
+                    var pos = startPos + i * dir * scale;
+                    if (i == num - 1)
+                    {
+                        scale = m_Scale * rest;
+                        pos -= dir * (1 - scale) / 2;
+                    }
+                    var info = new FlexGOInfo(new FlexNode(), pos, dir);
                     var flexGO = FlexFactory.CreateFlex(info);
                     flexGO.transform.SetParent(m_FlexGOParent.transform, false);
+                    flexGO.transform.localScale = new Vector3(flexGO.transform.localScale.x * m_Scale, flexGO.transform.localScale.y * m_Scale, flexGO.transform.localScale.z * scale);
                     gos[i] = flexGO;
                 }
                 m_OtherFlexGOList.Add(gos);
