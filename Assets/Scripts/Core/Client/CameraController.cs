@@ -31,24 +31,7 @@ namespace Assets.Scripts.Core.Client
             {
                 transform.position = Vector3.Lerp(transform.position, target.position + posOffset, Time.deltaTime * posLerp);
                 var lookAtPos = Vector3.Normalize(target.position - transform.position);
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    DoLook();
-                }
-                else
-                {
-                    if (m_LookAtTwner != null)
-                    {
-                        if (m_LookAtTwner.IsComplete())
-                        {
-                            transform.forward = lookAtPos;
-                        }
-                    }
-                    else
-                    {
-                        transform.forward = lookAtPos;
-                    }
-                }
+                transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.Normalize(Vector3.forward + Vector3.left));
             }
         }
     }
