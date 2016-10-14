@@ -1,7 +1,6 @@
 ﻿using DG.Tweening;
 using System;
 using System.IO;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace Assets.Scripts.Common
@@ -29,7 +28,7 @@ namespace Assets.Scripts.Common
             {
                 using (StringReader sr = new StringReader(xml))
                 {
-                    XmlSerializer xmlDes = new XmlSerializer(type);
+                    var xmlDes = new XmlSerializer(type);
                     return xmlDes.Deserialize(sr);
                 }
             }
@@ -41,14 +40,14 @@ namespace Assets.Scripts.Common
 
         public static object Deserialize(Type type, Stream stream)
         {
-            XmlSerializer xmlDes = new XmlSerializer(type);
+            var xmlDes = new XmlSerializer(type);
             return xmlDes.Deserialize(stream);
         }
 
         public static string Serializer(Type type, object obj)
         {
-            MemoryStream stream = new MemoryStream();
-            XmlSerializer xml = new XmlSerializer(type);
+            var stream = new MemoryStream();
+            var xml = new XmlSerializer(type);
             try
             {
                 xml.Serialize(stream, obj);
@@ -58,8 +57,8 @@ namespace Assets.Scripts.Common
                 throw;
             }
             stream.Position = 0;
-            StreamReader sr = new StreamReader(stream);
-            string str = sr.ReadToEnd();
+            var sr = new StreamReader(stream);
+            var str = sr.ReadToEnd();
 
             sr.Dispose();
             stream.Dispose();

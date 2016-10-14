@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="gb2312"?>
+<MazeInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <flexNodeList>
+    <FlexNode>
+      <type>Straight</type>
+      <idx>0</idx>
+      <time>0</time>
+    </FlexNode>
+    <FlexNode>
+      <type>Left</type>
+      <idx>1</idx>
+      <time>0.2</time>
+    </FlexNode>
+    <FlexNode>
+      <type>Right</type>
+      <idx>2</idx>
+      <time>0.8</time>
+    </FlexNode>
+  </flexNodeList>
+  <scale>1</scale>
+  <reactTime>0.2</reactTime>
+  <startPos>
+    <x>0</x>
+    <y>0</y>
+    <z>0</z>
+  </startPos>
+  <startDir>
+    <x>0</x>
+    <y>0</y>
+    <z>1</z>
+  </startDir>
+  <musicPath />
+</MazeInfo>
