@@ -16,6 +16,11 @@
       <idx>2</idx>
       <time>0.8</time>
     </FlexNode>
+    <FlexNode>
+      <type>Left</type>
+      <idx>3</idx>
+      <time>3</time>
+    </FlexNode>
   </flexNodeList>
   <scale>1</scale>
   <reactTime>0.2</reactTime>

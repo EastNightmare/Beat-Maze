@@ -86,7 +86,7 @@ namespace Assets.Editor.PRPR
             m_SelectEffectIdx = EditorGUILayout.Popup(m_SelectEffectIdx, new[] { "Red", "Green", "Blue" });
             if (m_Flexs == null || m_OtherFlexIdxs == null)
             {
-                LoadFromEditorPrefs();
+                //LoadFromEditorPrefs();
             }
         }
 
@@ -103,7 +103,6 @@ namespace Assets.Editor.PRPR
                 var mazeInfo = new MazeInfo(m_Flexs.Values.ToList(), m_Scale, m_ReactTime, startPos, startDir, musicPath);
                 var xmlStr = XmlUtil.Serializer(typeof(MazeInfo), mazeInfo);
                 File.WriteAllText(path, xmlStr);
-                SaveToEditorPrebs();
             }
             AssetDatabase.Refresh();
         }
@@ -126,6 +125,13 @@ namespace Assets.Editor.PRPR
             }
         }
 
+        private void ClearEditorPrefs()
+        {
+            EditorPrefs.DeleteKey("MazeInfo.OtherFlexIdx");
+            EditorPrefs.DeleteKey("MazeInfo.Flexs.Key");
+            EditorPrefs.DeleteKey("MazeInfo.Flexs.Value");
+        }
+
         private void SaveToEditorPrebs()
         {
             var strList = XmlUtil.Serializer(typeof(List<int[]>), m_OtherFlexIdxs);
@@ -134,6 +140,11 @@ namespace Assets.Editor.PRPR
             EditorPrefs.SetString("MazeInfo.OtherFlexIdx", strList);
             EditorPrefs.SetString("MazeInfo.Flexs.Key", strDicKey);
             EditorPrefs.SetString("MazeInfo.Flexs.Value", strDicValue);
+        }
+
+        private void OnHierarchyChange()
+        {
+            LoadFromEditorPrefs();
         }
 
         private void LoadFromEditorPrefs()
@@ -145,14 +156,13 @@ namespace Assets.Editor.PRPR
             var keys = XmlUtil.Deserialize(typeof(List<int>), strDicKey) as List<int>;
             var values = XmlUtil.Deserialize(typeof(List<FlexNode>), strDicValue) as List<FlexNode>;
             m_Flexs = new Dictionary<int, FlexNode>();
-            for (int i = 0; i < keys.Count; i++)
+            if (keys != null)
             {
-                m_Flexs.Add(keys[i], values[i]);
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    m_Flexs.Add(keys[i], values[i]);
+                }
             }
-        }
-
-        private void Func()
-        {
         }
 
         private void Pop()
@@ -167,6 +177,7 @@ namespace Assets.Editor.PRPR
             OnOtherFlexChange(false);
             m_Flexs.Remove(lastOne);
             DestroyImmediate(go);
+            UpdateGizmos();
         }
 
         private void Push(FlexNode node = null)
@@ -194,6 +205,20 @@ namespace Assets.Editor.PRPR
             flexGO.transform.localScale = Vector3.one * m_Scale;
             flexGO.transform.SetParent(m_FlexGOParent.transform);
             m_Flexs.Add(flexGO.transform.GetSiblingIndex(), n);
+            UpdateGizmos();
+            SaveToEditorPrebs();
+        }
+
+        private void UpdateGizmos()
+        {
+            var lastFlex = m_Flexs.Values.Last<FlexNode>();
+            var lastGO = m_FlexGOParent.transform.GetChild(m_FlexGOParent.transform.childCount - 1);
+            var gizmosDir = lastFlex.type == FlexType.Left
+                    ? -lastGO.transform.right
+                    : (lastFlex.type == FlexType.Right ? lastGO.transform.right : lastGO.transform.forward);
+            var gizmosPos = lastGO.position + gizmosDir;
+            MazeMapGizmos.instance.pathPos = gizmosPos;
+            MazeMapGizmos.instance.pathDirection = gizmosDir;
         }
 
         private void Clear()
@@ -207,6 +232,7 @@ namespace Assets.Editor.PRPR
             m_OtherFlexIdxs = null;
             m_FlexTime = 0;
             m_Clip = null;
+            ClearEditorPrefs();
         }
 
         private void OnOtherFlexChange(bool add = true)
@@ -268,25 +294,6 @@ namespace Assets.Editor.PRPR
             }
         }
 
-        private void OnLoadNodeFinish(FlexNode node)
-        {
-            if (node == null)
-            {
-                return;
-            }
-            var lastFlexIdx = m_Flexs.Keys.Last<int>();
-            var flexGO = m_FlexGOParent.transform.GetChild(lastFlexIdx).gameObject;
-            var flexType = m_Flexs.Values.Last<FlexNode>().type;
-            m_FlexTime = m_Flexs[lastFlexIdx].time;
-            var preFlexTime = node.time;
-            var timeBetween = m_FlexTime - preFlexTime;
-            m_FlexForwardDir = flexType == FlexType.Left
-                ? -flexGO.transform.right
-                : (flexType == FlexType.Right ? flexGO.transform.right : flexGO.transform.forward);
-            m_FlexPosition += m_FlexForwardDir * m_Scale * (timeBetween / m_ReactTime);
-            OnOtherFlexChange();
-        }
-
         private void OnFlexChange(bool isPush = true, FlexNode node = null)
         {
             if (m_Flexs.Count == 0)
@@ -314,11 +321,7 @@ namespace Assets.Editor.PRPR
                     preFlexTime = m_Flexs.Values.ToList()[m_Flexs.Count - 2].time;
                 }
                 var timeBetween = curFlexTime - preFlexTime;
-                m_FlexForwardDir = flexType == FlexType.Left
-                    ? -flexGO.transform.right
-                    : (flexType == FlexType.Right ? flexGO.transform.right : flexGO.transform.forward);
 
-                m_FlexPosition -= m_FlexForwardDir * m_Scale * (timeBetween / m_ReactTime);
                 if (m_Flexs.Count > 1)
                 {
                     flexGO = m_FlexGOParent.transform.GetChild(m_Flexs.Keys.ToList()[m_Flexs.Count - 2]).gameObject; ;
@@ -330,13 +333,12 @@ namespace Assets.Editor.PRPR
                 {
                     m_FlexForwardDir = Vector3.zero;
                 }
-            }
+                m_FlexForwardDir = flexType == FlexType.Left
+                   ? -flexGO.transform.right
+                   : (flexType == FlexType.Right ? flexGO.transform.right : flexGO.transform.forward);
 
-            var gizmosDir = (FlexType)m_SelectFlexTypeIdx == FlexType.Left
-                        ? -flexGO.transform.right
-                        : (flexType == FlexType.Right ? flexGO.transform.right : flexGO.transform.forward);
-            MazeMapGizmos.instance.pathPos = m_FlexPosition + gizmosDir;
-            MazeMapGizmos.instance.pathDirection = gizmosDir;
+                m_FlexPosition -= m_FlexForwardDir * m_Scale * (timeBetween / m_ReactTime);
+            }
         }
 
         [MenuItem("PRPR Studio Tools/Maze Maker")]
