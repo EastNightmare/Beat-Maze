@@ -1,14 +1,12 @@
-﻿using Assets.Scripts.Common;
-using Assets.Scripts.Core.Client.Enum;
+﻿using Assets.Scripts.Core.Client.Enum;
 using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.Tool;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Scripts.Core.Client
+namespace Assets.Scripts.Core.Client.MazeManager
 {
-    public class FlexFactory
+    public class MazeManager
     {
         public static GameObject CreateFlex(FlexGOInfo info)
         {

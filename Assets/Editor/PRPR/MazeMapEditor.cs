@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Common;
 using Assets.Scripts.Core.Client;
 using Assets.Scripts.Core.Client.Enum;
+using Assets.Scripts.Core.Client.MazeManager;
 using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.PRPR_Editor;
 using Assets.Scripts.Tool;
@@ -84,10 +85,6 @@ namespace Assets.Editor.PRPR
             m_FlexForwardDir = EditorGUILayout.Vector3Field("Flex Forward Direction", m_FlexForwardDir);
             m_FlexTime = EditorGUILayout.FloatField("Flex Time", m_FlexTime);
             m_SelectEffectIdx = EditorGUILayout.Popup(m_SelectEffectIdx, new[] { "Red", "Green", "Blue" });
-            if (m_Flexs == null || m_OtherFlexIdxs == null)
-            {
-                //LoadFromEditorPrefs();
-            }
         }
 
         private void Save()
@@ -201,7 +198,7 @@ namespace Assets.Editor.PRPR
             var flexType = (FlexType)m_SelectFlexTypeIdx;
             var n = node ?? new FlexNode(m_Flexs.Count, flexType, m_FlexTime);
             var info = new FlexGOInfo(n, m_FlexPosition, m_FlexForwardDir);
-            var flexGO = FlexFactory.CreateFlex(info);
+            var flexGO = MazeManager.CreateFlex(info);
             flexGO.transform.localScale = Vector3.one * m_Scale;
             flexGO.transform.SetParent(m_FlexGOParent.transform);
             m_Flexs.Add(flexGO.transform.GetSiblingIndex(), n);
@@ -266,7 +263,7 @@ namespace Assets.Editor.PRPR
                         pos -= dir * (1 - scale) / 2;
                     }
                     var info = new FlexGOInfo(new FlexNode(), pos, dir);
-                    var flexGO = FlexFactory.CreateFlex(info);
+                    var flexGO = MazeManager.CreateFlex(info);
                     flexGO.transform.SetParent(m_FlexGOParent.transform, false);
                     flexGO.transform.localScale = new Vector3(flexGO.transform.localScale.x * m_Scale, flexGO.transform.localScale.y * m_Scale, flexGO.transform.localScale.z * scale);
                     goIdxs[i] = flexGO.transform.GetSiblingIndex();
@@ -287,7 +284,7 @@ namespace Assets.Editor.PRPR
                     }
                     foreach (var go in goToRemove)
                     {
-                        FlexFactory.DestroyFlex(go);
+                        MazeManager.DestroyFlex(go);
                     }
                     m_OtherFlexIdxs.Remove(goIdxs);
                 }

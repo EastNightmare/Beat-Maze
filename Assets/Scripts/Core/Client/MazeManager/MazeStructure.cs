@@ -4,11 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Core.Client.Structure
 {
-    public class Node
-    {
-    }
-
-    public class FlexNode : Node
+    public class FlexNode
     {
         public FlexType type;
         public int idx;

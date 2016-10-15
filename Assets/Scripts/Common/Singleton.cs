@@ -22,6 +22,32 @@ namespace Assets.Scripts.Common
         }
     }
 
+    public class SingletonScriptObject<T> : ScriptableObject where T : ScriptableObject
+    {
+        private static T m_Instance;
+
+        /// <summary>
+        /// Get singleton instance
+        /// </summary>
+        public static T instance
+        {
+            get
+            {
+                if (m_Instance == null)
+                {
+                    m_Instance = ScriptableObject.CreateInstance<T>();
+                }
+                return m_Instance;
+            }
+        }
+
+        public void DestroyInstance()
+        {
+            ScriptableObject.Destroy(m_Instance);
+            m_Instance = null;
+        }
+    }
+
     public class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T m_Instance;
@@ -56,7 +82,7 @@ namespace Assets.Scripts.Common
             m_Instance = null;
         }
 
-        protected void Awake()
+        private void Awake()
         {
             if (this != instance)
             {
