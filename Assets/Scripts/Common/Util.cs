@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -17,6 +18,26 @@ namespace Assets.Scripts.Common
             });
             seq.Play();
             return seq;
+        }
+    }
+
+    public class ArrayUtil<T>
+    {
+        public static bool Contains(T[] array, T value)
+        {
+            return new List<T>(array).Contains(value);
+        }
+
+        public static T[] Add(T[] array, T value)
+        {
+            return new List<T>(array) { value }.ToArray();
+        }
+
+        public static T[] Remove(T[] array, T value)
+        {
+            var list = new List<T>(array);
+            list.Remove(value);
+            return list.ToArray();
         }
     }
 

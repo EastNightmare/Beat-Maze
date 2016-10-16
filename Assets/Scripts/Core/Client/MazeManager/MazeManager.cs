@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Core.Client.Enum;
-using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.Tool;
 using System.Collections.Generic;
 using UnityEngine;

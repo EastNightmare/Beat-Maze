@@ -2,7 +2,6 @@
 using Assets.Scripts.Core.Client;
 using Assets.Scripts.Core.Client.Enum;
 using Assets.Scripts.Core.Client.MazeManager;
-using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.PRPR_Editor;
 using Assets.Scripts.Tool;
 using System.Collections.Generic;

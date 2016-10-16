@@ -11,5 +11,6 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
         Pow,
         Sqrt,
         Log,
+        None,
     }
 }

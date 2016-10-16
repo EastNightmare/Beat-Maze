@@ -1,6 +1,5 @@
 ﻿using Assets.Scripts.Common;
 using Assets.Scripts.Core.Client.MazeManager;
-using Assets.Scripts.Core.Client.Structure;
 using Assets.Scripts.Tool;
 using DG.Tweening;
 using System.Collections.Generic;
@@ -22,8 +21,6 @@ namespace Assets.Scripts.Core.Client
 
         private void Awake()
         {
-            var result = 2;
-            Debug.Log(int.TryParse("1.0", out result));
             var mazeInfo = XmlUtil.Deserialize(typeof(MazeInfo), xmlAsset.text) as MazeInfo;
             m_FlexInfoList = MazeManager.MazeManager.CreateInfoList(mazeInfo.flexNodeList, Vector3.zero, Vector3.forward, 1.0f);
             m_ReactSpeed = mazeInfo.scale / mazeInfo.reactTime;

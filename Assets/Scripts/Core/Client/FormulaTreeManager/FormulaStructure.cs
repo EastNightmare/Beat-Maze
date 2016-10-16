@@ -1,17 +1,26 @@
-﻿using System;
+﻿using Assets.Scripts.Common;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts.Core.Client.FormulaTreeManager
 {
+    [System.Serializable]
     public class FormulaObject
     {
-        public object value;
+        [SerializeField]
+        public string value;
 
-        public FormulaObject(object v)
+        public FormulaObject(string v)
         {
             value = v;
+        }
+
+        public FormulaObject()
+        {
+            value = string.Empty;
         }
 
         public FormulaObject Operate(FormulaObject obj, FormulaNodeOperate operate)
@@ -41,7 +50,7 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
                     }
                 case FormulaNodeOperate.Sqrt:
                     {
-                        return Log(new FormulaObject(0.5f));
+                        return Log(new FormulaObject("0.5"));
                     }
                 case FormulaNodeOperate.Log:
                     {
@@ -53,96 +62,74 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
 
         public FormulaObject Log(FormulaObject obj)
         {
-            obj = new FormulaObject(1f) / obj;
+            obj = new FormulaObject("1.0") / obj;
             return Pow(obj);
         }
 
         public FormulaObject Pow(FormulaObject obj)
         {
-            var strValue = value.ToString();
             var intResult = 0;
-            var floatResult = 0f;
-            var result = Mathf.Pow((float)value, (float)obj.value);
-            if (int.TryParse(strValue, out intResult))
+            var result = Mathf.Pow(float.Parse(value), float.Parse(obj.value));
+            if (int.TryParse(value, out intResult))
             {
-                value = (int)result;
+                intResult = (int)result;
             }
-            else if (float.TryParse(strValue, out floatResult))
-            {
-                value = (float)result;
-            }
-            return new FormulaObject(value);
+            return new FormulaObject(intResult.ToString());
         }
 
         public static FormulaObject operator +(FormulaObject lhs, FormulaObject rhs)
         {
-            var lStr = lhs.value.ToString();
-            var rStr = rhs.value.ToString();
             var intResult = 0;
             var floatResult = 0f;
-            if (int.TryParse(lStr, out intResult))
+            if (int.TryParse(lhs.value, out intResult))
             {
-                intResult += int.Parse(rStr);
-                return new FormulaObject(intResult);
+                intResult += int.Parse(rhs.value);
+                return new FormulaObject(intResult.ToString());
             }
-            else if (float.TryParse(lStr, out floatResult))
+            else if (float.TryParse(lhs.value, out floatResult))
             {
-                floatResult += float.Parse(rStr);
-                return new FormulaObject(floatResult);
+                floatResult += float.Parse(rhs.value);
+                return new FormulaObject(floatResult.ToString());
             }
-            return new FormulaObject(lStr + rStr);
+            return new FormulaObject(lhs.value + rhs.value);
         }
 
         public static FormulaObject operator -(FormulaObject lhs, FormulaObject rhs)
         {
-            var rStr = rhs.value.ToString();
-            var intResult = 0;
-            var floatResult = 0f;
-            if (int.TryParse(rStr, out intResult))
-            {
-                intResult = -intResult;
-                return lhs + new FormulaObject(intResult);
-            }
-            else if (float.TryParse(rStr, out floatResult))
-            {
-                floatResult = -floatResult;
-                return lhs + new FormulaObject(floatResult);
-            }
-            return lhs;
+            var opposite = new FormulaObject("-" + rhs.value);
+            return lhs + opposite;
         }
 
         public static FormulaObject operator *(FormulaObject lhs, FormulaObject rhs)
         {
-            var lStr = lhs.value.ToString();
-            var rStr = rhs.value.ToString();
             var intResult = 0;
             var floatResult = 0f;
-            if (int.TryParse(lStr, out intResult))
+            if (int.TryParse(lhs.value, out intResult))
             {
-                floatResult *= int.Parse(rStr);
-                return new FormulaObject(floatResult);
+                intResult *= int.Parse(rhs.value);
+                return new FormulaObject(intResult.ToString());
             }
-            else if (float.TryParse(lStr, out floatResult))
+            else if (float.TryParse(lhs.value, out floatResult))
             {
-                floatResult *= float.Parse(rStr);
-                return new FormulaObject(floatResult);
+                floatResult *= float.Parse(rhs.value);
+                return new FormulaObject(floatResult.ToString());
             }
-            return lhs;
+            return new FormulaObject(lhs.value);
         }
 
         public static FormulaObject operator /(FormulaObject lhs, FormulaObject rhs)
         {
-            var rStr = rhs.value.ToString();
             var floatResult = 0f;
-            if (float.TryParse(rStr, out floatResult))
+            if (float.TryParse(rhs.value, out floatResult))
             {
                 floatResult = 1 / floatResult;
-                return lhs * new FormulaObject(floatResult);
+                return lhs * new FormulaObject(floatResult.ToString());
             }
-            return lhs;
+            return new FormulaObject(lhs.value);
         }
     }
 
+    [System.Serializable]
     public class FormulaNode
     {
         public string key;
@@ -163,14 +150,15 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
             key = string.Empty;
             parent = null;
             childs = new List<FormulaNode>();
-            operate = FormulaNodeOperate.Add;
+            operate = FormulaNodeOperate.None;
         }
 
-        public FormulaNode(string k, FormulaNode p, List<FormulaNode> list)
+        public FormulaNode(string k, FormulaNode p, List<FormulaNode> list, FormulaNodeOperate o)
         {
             key = k;
             parent = p;
             childs = list;
+            operate = o;
             p.childs.Add(this);
         }
 
@@ -183,6 +171,53 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
         private FormulaObject CalculateValue()
         {
             return childs.Select(child => FormulaTree.instance.formulaObjs[child.key]).Aggregate<FormulaObject, FormulaObject>(null, (current, obj) => obj.Operate(current, operate));
+        }
+    }
+
+    [System.Serializable]
+    public class FormulaObjPair
+    {
+        public string key;
+        public string type;
+        public FormulaObject value;
+
+        public FormulaObjPair()
+        {
+            key = string.Empty;
+            type = string.Empty;
+            value = new FormulaObject();
+        }
+
+        public FormulaObjPair(string k, string t, FormulaObject f)
+        {
+            key = k;
+            type = t;
+            value = f;
+        }
+    }
+
+    [System.Serializable]
+    public class FormulaObjDictionary
+    {
+        public List<FormulaObjPair> pairs;
+
+        public FormulaObject this[string idx]
+        {
+            get
+            {
+                return (from formulaPair in pairs where formulaPair.key == idx select formulaPair.value).FirstOrDefault();
+            }
+            set
+            {
+                foreach (var formulaPair in pairs)
+                {
+                    if (formulaPair.key == idx)
+                    {
+                        formulaPair.value = value;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

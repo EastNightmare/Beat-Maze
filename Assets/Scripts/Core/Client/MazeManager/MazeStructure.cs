@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Scripts.Core.Client.Structure
+namespace Assets.Scripts.Core.Client.MazeManager
 {
     public class FlexNode
     {
