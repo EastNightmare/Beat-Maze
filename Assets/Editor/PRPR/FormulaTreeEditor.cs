@@ -20,7 +20,9 @@ namespace Assets.Editor.PRPR
         private string m_CurTypeName = string.Empty;
         private int m_SelectedTypeIdx = 0;
         private bool m_CreateFlag = false;
-        private string[] m_TypeNames = new string[0];
+
+        [SerializeField]
+        private List<string> m_TypeNames = new List<string>();
 
         [MenuItem("PRPR Studio Tools/Formula Tree")]
         private static void Init()
@@ -81,7 +83,8 @@ namespace Assets.Editor.PRPR
             GUILayout.Space(5);
             if (GUILayout.Button("Finish"))
             {
-                m_TypeNames = ArrayUtil<string>.Add(m_TypeNames, m_CurTypeName);
+                m_TypeNames.Add(m_CurTypeName);
+                m_SelectedTypeIdx = m_TypeNames.Count - 1;
                 m_NewTypeName = false;
                 m_CreateFlag = true;
             }
@@ -95,15 +98,11 @@ namespace Assets.Editor.PRPR
         private void OnDynamicParamsWindow(int idx)
         {
             m_FormulaTreeObj.Update();
-            var formulaObjs = m_FormulaTreeObj.FindProperty("formulaObjs");
-            var pairs = formulaObjs.FindPropertyRelative("pairs");
+            var pairs = m_FormulaTreeObj.FindProperty("formulaObjs").FindPropertyRelative("pairs");
             if (GUILayout.Button("New Group"))
             {
                 m_NewTypeName = true;
             }
-            m_SelectedTypeIdx = GUILayout.SelectionGrid(m_SelectedTypeIdx, m_TypeNames, m_TypeNames.Length);
-            GUILayout.BeginVertical();
-            m_DynamicWindowOffset = GUILayout.BeginScrollView(m_DynamicWindowOffset, false, true);
             if (m_CreateFlag)
             {
                 pairs.InsertArrayElementAtIndex(pairs.arraySize);
@@ -111,22 +110,26 @@ namespace Assets.Editor.PRPR
                 newPair.FindPropertyRelative("type").stringValue = m_CurTypeName;
                 m_CreateFlag = false;
             }
-            var count = 0;
+
+            m_SelectedTypeIdx = GUILayout.SelectionGrid(m_SelectedTypeIdx, m_TypeNames.ToArray(), m_TypeNames.Count);
+            GUILayout.BeginVertical();
+            m_DynamicWindowOffset = GUILayout.BeginScrollView(m_DynamicWindowOffset, false, true);
+
             for (int i = 0; i < pairs.arraySize; i++)
             {
                 var pair = pairs.GetArrayElementAtIndex(i);
                 var key = pair.FindPropertyRelative("key");
                 var value = pair.FindPropertyRelative("value");
                 var typeName = pair.FindPropertyRelative("type").stringValue;
-                if (!ArrayUtil<string>.Contains(m_TypeNames, typeName))
+                if (!m_TypeNames.Contains(typeName))
                 {
-                    m_TypeNames = ArrayUtil<string>.Add(m_TypeNames, typeName);
+                    m_TypeNames.Add(typeName);
+                    m_SelectedTypeIdx = m_TypeNames.Count - 1;
                 }
                 GUILayout.BeginHorizontal();
 
                 if (typeName == m_TypeNames[m_SelectedTypeIdx])
                 {
-                    count++;
                     GUILayout.Label("Key:");
                     EditorGUILayout.PropertyField(key, GUIContent.none);
                     GUILayout.Label("Value:");
@@ -140,12 +143,12 @@ namespace Assets.Editor.PRPR
                     if (GUILayout.Button("-", EditorStyles.miniButtonRight))
                     {
                         pairs.DeleteArrayElementAtIndex(i);
-                        if (count == 1)
+                        if (!ContainType(typeName))
                         {
-                            m_TypeNames = ArrayUtil<string>.Remove(m_TypeNames, m_TypeNames[m_SelectedTypeIdx]);
-                            if (m_SelectedTypeIdx > 0)
+                            m_TypeNames.Remove(typeName);
+                            if (m_TypeNames.Count > 0)
                             {
-                                m_SelectedTypeIdx--;
+                                m_SelectedTypeIdx = m_TypeNames.Count - 1;
                             }
                         }
                     }
@@ -157,6 +160,20 @@ namespace Assets.Editor.PRPR
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
             m_FormulaTreeObj.ApplyModifiedProperties();
+        }
+
+        private bool ContainType(string strType)
+        {
+            var pairs = m_FormulaTreeObj.FindProperty("formulaObjs").FindPropertyRelative("pairs");
+            for (int i = 0; i < pairs.arraySize; i++)
+            {
+                var type = pairs.GetArrayElementAtIndex(i).FindPropertyRelative("type").stringValue;
+                if (type == strType)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
