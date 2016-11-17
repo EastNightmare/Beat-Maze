@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478a3b957c99e79448b0a8632be730e3, type: 3}
+  m_Name: Json Configs
+  m_EditorClassIdentifier: 
+  configs:
+    m_Keys:
+    - char_cos
+    m_Values:
+    - '{"1":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Urchin","path":"char/urchin/_prefab/urchin_normal","description":"\u8981\u6253\u67B6\u5417\uFF1F","id":1,"uid":10},"2":{"name":"\u5929\u4F7F\u5957","owner":"Urchin","path":"char/urchin/_prefab/urchin_angel","description":"\u65E2\u7136\u6709\u4E86\u7FC5\u8180\uFF0C\u4E0B\u4E00\u6B65\u5C31\u8981\u4E0A\u5929\u3002","id":2,"uid":11},"3":{"name":"\u670B\u514B\u5957","owner":"Urchin","path":"char/urchin/_prefab/urchin_punk","description":"\u5C11\u58EE\u4E0D\u52AA\u529B\uFF0C\u8001\u5927\u73A9\u670B\u514B\u3002","id":3,"uid":12},"4":{"name":"\u5154\u5973\u90CE","owner":"Urchin","path":"char/urchin/_prefab/urchin_rabbit","description":"\u5BA2\u5B98\u8BF7\u81EA\u91CD\uFF0C\u5C0F\u5973\u5B50\u4E0D\u5356\u827A\u3002","id":4,"uid":13},"5":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Buro","path":"char/buro/_prefab/buro_normal","description":"\u718A\u9A91\u58EB\u662F\u4E5F\u3002","id":5,"uid":20},"6":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Buro","path":"char/buro/_prefab/buro_normal_old","description":"\u718A\u9A91\u58EB\u662F\u4E5F\u3002","id":6,"uid":21},"7":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Buro","path":"char/buro/_prefab/buro_normal","description":"\u718A\u9A91\u58EB\u662F\u4E5F\u3002","id":7,"uid":22},"8":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Buro","path":"char/buro/_prefab/buro_normal","description":"\u718A\u9A91\u58EB\u662F\u4E5F\u3002","id":8,"uid":23},"9":{"name":"\u9ED8\u8BA4\u670D\u88C5","owner":"Marija","path":"char/marija/_prefab/marija_normal","description":"\u4ECA\u5929\u7684\u98CE\u513F\u5F88\u55A7\u56A3\u3002","id":9,"uid":30},"10":{"name":"\u6076\u9B54\u5957","owner":"Marija","path":"char/marija/_prefab/marija_davil","description":"\u4E0D\u8981\u518D\u63A5\u8FD1\u6211\uFF0C\u4F1A\u6B7B\u7684\u3002","id":10,"uid":31},"11":{"name":"\u5973\u4EC6\u5957","owner":"Marija","path":"char/marija/_prefab/marija_maid","description":"\u6211\u60F3\u8981\u4E2A\u6B63\u5F0F\u7684\u96F7\u59C6\u5934\u3002","id":11,"uid":32},"12":{"name":"\u5DEB\u5973\u5957","owner":"Marija","path":"char/marija/_prefab/marija_witch","description":"\u8FD9\u91CC\u7684\u82F9\u679C\u6CA1\u6709\u6BD2\u3002","id":12,"uid":33}}'

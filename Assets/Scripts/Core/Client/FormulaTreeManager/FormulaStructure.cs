@@ -23,36 +23,36 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
             value = string.Empty;
         }
 
-        public FormulaObject Operate(FormulaObject obj, FormulaNodeOperate operate)
+        public FormulaObject Operate(FormulaObject obj, FormulaNodeType type)
         {
-            switch (operate)
+            switch (type)
             {
-                case FormulaNodeOperate.Add:
+                case FormulaNodeType.Add:
                     {
                         return this + obj;
                     }
 
-                case FormulaNodeOperate.Minus:
+                case FormulaNodeType.Minus:
                     {
                         return this - obj;
                     }
-                case FormulaNodeOperate.Mul:
+                case FormulaNodeType.Mul:
                     {
                         return this * obj;
                     }
-                case FormulaNodeOperate.Divid:
+                case FormulaNodeType.Divid:
                     {
                         return this * obj;
                     }
-                case FormulaNodeOperate.Pow:
+                case FormulaNodeType.Pow:
                     {
                         return Pow(obj);
                     }
-                case FormulaNodeOperate.Sqrt:
+                case FormulaNodeType.Sqrt:
                     {
-                        return Log(new FormulaObject("0.5"));
+                        return Log(new FormulaObject("2"));
                     }
-                case FormulaNodeOperate.Log:
+                case FormulaNodeType.Log:
                     {
                         return Log(obj);
                     }
@@ -134,14 +134,39 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
     {
         public string key;
         public FormulaNode parent;
-        public FormulaNodeOperate operate;
+        public FormulaNodeType type;
         public List<FormulaNode> childs;
 
         public FormulaObject value
         {
             get
             {
-                return childs.Count == 0 ? GetSelfValue() : CalculateValue();
+                switch (type)
+                {
+                    case FormulaNodeType.Variable:
+                        {
+                            return GetSelfValue();
+                        }
+                    case FormulaNodeType.JsonData:
+                        {
+                            var idx = "0";
+                            var parentArray = GetParent(node => node.type == FormulaNodeType.Array);
+                            idx = parentArray.GetChild(child => child.key == "Index").value.value;
+                            return new FormulaObject((string)ConfigManager.ConfigManager.instance.pool[idx][key]);
+                        }
+                    case FormulaNodeType.Constance:
+                        {
+                            return new FormulaObject(key);
+                        }
+                    case FormulaNodeType.Array:
+                        {
+                            return new FormulaObject(key);
+                        }
+                    default:
+                        {
+                            return CalculateValue();
+                        }
+                }
             }
         }
 
@@ -150,15 +175,15 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
             key = string.Empty;
             parent = null;
             childs = new List<FormulaNode>();
-            operate = FormulaNodeOperate.None;
+            type = FormulaNodeType.None;
         }
 
-        public FormulaNode(string k, FormulaNode p, List<FormulaNode> list, FormulaNodeOperate o)
+        public FormulaNode(string k, FormulaNode p, List<FormulaNode> list, FormulaNodeType t)
         {
             key = k;
             parent = p;
             childs = list;
-            operate = o;
+            type = t;
             p.childs.Add(this);
         }
 
@@ -170,7 +195,43 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
 
         private FormulaObject CalculateValue()
         {
-            return childs.Select(child => FormulaTree.instance.formulaObjs[child.key]).Aggregate<FormulaObject, FormulaObject>(null, (current, obj) => obj.Operate(current, operate));
+            return childs.Select(child => FormulaTree.instance.formulaObjs[child.key]).Aggregate<FormulaObject, FormulaObject>(null, (current, obj) => obj.Operate(current, type));
+        }
+
+        private FormulaNode GetParent(Func<FormulaNode, bool> matchFunc)
+        {
+            var p = parent;
+            if (p == null)
+            {
+                return p;
+            }
+            var isMatch = matchFunc(parent);
+            if (!isMatch)
+            {
+                return p.GetParent(matchFunc);
+            }
+            return p;
+        }
+
+        private FormulaNode GetChild(Func<FormulaNode, bool> matchFunc)
+        {
+            if (childs == null)
+            {
+                return null;
+            }
+            foreach (var child in childs)
+            {
+                var isMatch = matchFunc(child);
+                if (isMatch)
+                {
+                    return child;
+                }
+                else
+                {
+                    return child.GetChild(matchFunc);
+                }
+            }
+            return null;
         }
     }
 

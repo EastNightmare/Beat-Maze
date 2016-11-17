@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Core.Client.FormulaTreeManager
 {
-    public enum FormulaNodeOperate
+    public enum FormulaNodeType
     {
         Add,
         Minus,
@@ -12,5 +12,11 @@ namespace Assets.Scripts.Core.Client.FormulaTreeManager
         Sqrt,
         Log,
         None,
+
+        Constance,
+        JsonData,
+        Variable,
+
+        Array,
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Assets.Scripts.Core.Client.FormulaTreeManager
 {
-    [CreateAssetMenu()]
     public class FormulaTree : SingletonScriptObject<FormulaTree>
     {
         public FormulaNode head;

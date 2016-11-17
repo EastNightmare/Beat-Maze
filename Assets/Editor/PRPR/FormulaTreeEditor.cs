@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Common;
 using Assets.Scripts.Core.Client.FormulaTreeManager;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -10,10 +11,9 @@ namespace Assets.Editor.PRPR
     {
         private static float m_Height = 1000;
         private Rect m_DynamicWindowRect = new Rect(0, 0, 300, m_Height);
-        private Rect m_TreeWindowRect = new Rect(300, 0, 500, m_Height);
-        private Rect m_FuncWindowRect = new Rect(800, 0, 300, m_Height);
+        private Rect m_TreeWindowRect = new Rect(300, 0, 800, m_Height);
         private Rect m_TypeNameWindowRect = new Rect(100, 100, 100, 100);
-        private Rect[] m_FormulaNodeRect = new Rect[255];
+
         private Vector2 m_DynamicWindowOffset;
         private SerializedObject m_FormulaTreeObj;
         private bool m_NewTypeName = false;
@@ -22,7 +22,27 @@ namespace Assets.Editor.PRPR
         private bool m_CreateFlag = false;
 
         [SerializeField]
+        private List<Rect> m_FormulaNodeRects = new List<Rect>();
+
+        [SerializeField]
         private List<string> m_TypeNames = new List<string>();
+
+        [SerializeField]
+        private List<FormulaNode> m_Nodes = new List<FormulaNode>();
+
+        private GUIContent[] m_FuncContents = new[]
+        {
+            new GUIContent("Maths/Add"),
+            new GUIContent("Maths/Minus"),
+            new GUIContent("Maths/Mul"),
+            new GUIContent("Maths/Divid"),
+            new GUIContent("Maths/Pow"),
+            new GUIContent("Maths/Sqrt"),
+            new GUIContent("Maths/Log"),
+
+            new GUIContent("Data/Constance"),
+            new GUIContent("Data/Variable"),
+        };
 
         [MenuItem("PRPR Studio Tools/Formula Tree")]
         private static void Init()
@@ -34,44 +54,36 @@ namespace Assets.Editor.PRPR
         private void OnEnable()
         {
             m_FormulaTreeObj = new SerializedObject(Resources.Load<FormulaTree>("Formulas/Formula Data"));
-            for (int i = 0; i < m_FormulaNodeRect.Length; i++)
-            {
-                m_FormulaNodeRect[i] = new Rect(500, 200, 100, 100);
-            }
         }
 
         private void OnGUI()
         {
             BeginWindows();
             m_DynamicWindowRect = GUI.Window(1, m_DynamicWindowRect, OnDynamicParamsWindow, "Dynamic Params");
-            OnTreeWindow();
-            m_FuncWindowRect = GUI.Window(3, m_FuncWindowRect, OnFuncWindow, "Func");
             if (m_NewTypeName)
             {
                 m_TypeNameWindowRect = GUI.Window(4, m_TypeNameWindowRect, OnTypeNameWindow, "Add Type Name");
             }
+            OnTreeWindow();
+            OnPopFuncMenu();
             EndWindows();
         }
 
         private void OnTreeWindow()
         {
-            GUI.Box(new Rect(300, 0, 500, 20), "Tree Graph");
+            GUI.Box(new Rect(300, 0, 800, 20), "Tree Graph");
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < m_FormulaNodeRects.Count; i++)
             {
-                m_FormulaNodeRect[i] = GUI.Window(5, m_FormulaNodeRect[i], OnFormulaNodeWindow, "Formula Node");
+                m_FormulaNodeRects[i] = GUI.Window(5, m_FormulaNodeRects[i], OnFormulaNodeWindow, "Formula Node");
             }
-        }
-
-        private void OnFuncWindow(int idx)
-        {
         }
 
         private void OnFormulaNodeWindow(int idx)
         {
             m_FormulaTreeObj.Update();
             GUI.DragWindow(new Rect(0, 0, 100, 10));
-            var head = m_FormulaTreeObj.FindProperty("head").FindPropertyRelative("operate");
+            var head = m_FormulaTreeObj.FindProperty("head").FindPropertyRelative("type");
             EditorGUILayout.PropertyField(head, GUIContent.none);
             m_FormulaTreeObj.ApplyModifiedProperties();
         }
@@ -143,7 +155,17 @@ namespace Assets.Editor.PRPR
                     if (GUILayout.Button("-", EditorStyles.miniButtonRight))
                     {
                         pairs.DeleteArrayElementAtIndex(i);
-                        if (!ContainType(typeName))
+                        var isContains = false;
+                        for (int j = 0; j < pairs.arraySize; j++)
+                        {
+                            var type = pairs.GetArrayElementAtIndex(j).FindPropertyRelative("type").stringValue;
+                            if (type == typeName)
+                            {
+                                isContains = true;
+                                break;
+                            }
+                        }
+                        if (!isContains)
                         {
                             m_TypeNames.Remove(typeName);
                             if (m_TypeNames.Count > 0)
@@ -162,18 +184,39 @@ namespace Assets.Editor.PRPR
             m_FormulaTreeObj.ApplyModifiedProperties();
         }
 
-        private bool ContainType(string strType)
+        private void OnPopFuncMenu()
         {
-            var pairs = m_FormulaTreeObj.FindProperty("formulaObjs").FindPropertyRelative("pairs");
-            for (int i = 0; i < pairs.arraySize; i++)
+            var currentEvent = Event.current;
+            if (currentEvent.type == EventType.ContextClick)
             {
-                var type = pairs.GetArrayElementAtIndex(i).FindPropertyRelative("type").stringValue;
-                if (type == strType)
+                Vector2 mousePos = currentEvent.mousePosition;
+                if (m_TreeWindowRect.Contains(mousePos))
                 {
-                    return true;
+                    GenericMenu menu = new GenericMenu();
+                    foreach (var funcContent in m_FuncContents)
+                    {
+                        menu.AddItem(funcContent, false, obj =>
+                        {
+                            var formulaNode = new FormulaNode();
+                            m_FormulaNodeRects.Add(new Rect(mousePos.x, mousePos.y, 100, 100));
+                            m_Nodes.Add(formulaNode);
+
+                            var str = obj.ToString();
+                            if (str.Contains("Maths/"))
+                            {
+                                formulaNode.type = (FormulaNodeType)Enum.Parse(typeof(FormulaNodeType),
+                                    str.Replace("Maths/", string.Empty));
+                            }
+                            else
+                            {
+                                formulaNode.key = "0";
+                            }
+                        }, funcContent.ToString());
+                    }
+                    menu.ShowAsContext();
+                    currentEvent.Use();
                 }
             }
-            return false;
         }
     }
 }

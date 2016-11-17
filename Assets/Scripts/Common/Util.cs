@@ -41,6 +41,20 @@ namespace Assets.Scripts.Common
         }
     }
 
+    public class StringUtil
+    {
+        public static string LastAfter(string str, char split)
+        {
+            var strArray = str.Split(split);
+            return strArray[strArray.Length - 1];
+        }
+
+        public static string BeginBefore(string str, char split)
+        {
+            return str.Split(split)[0];
+        }
+    }
+
     public class XmlUtil
     {
         public static object Deserialize(Type type, string xml)

@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Common;
+using Assets.Scripts.Core.Client.ConfigManager;
 using Assets.Scripts.Core.Client.MazeManager;
 using Assets.Scripts.Tool;
 using DG.Tweening;
